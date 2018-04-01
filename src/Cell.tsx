@@ -1,39 +1,37 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { css } from 'styled-components';
-import { CellEntity, CellStatus } from './mobx/Store';
+import { Game, CellEntity, CellStatus } from './mobx/Store';
 import { observer } from 'mobx-react';
 
 interface IProps {
   text?: string;
   className?: string;
   entity: CellEntity;
+  game: Game;
+  x: number;
+  y: number;
 }
 
 const NotExposed = styled.div`
   flex: 1;
-  background-color: white;
+  border-radius: 6px;
+  background-color: #92b4f4;
 `;
 
-const Exposed = styled.div`
-  flex: 1;
-  background-color: #ccc;
+const Exposed = NotExposed.extend`
+  background-color: #fff;
 `;
 
 @observer
 class Cell extends React.Component<IProps> {
   handleClick = () => {
     console.log('Click!');
-    const entity = this.props.entity;
-    entity.neiborMine += 1;
-    if (entity.status === CellStatus.DEFAULT) {
-      entity.status = CellStatus.EXPOSED;
-    } else {
-      entity.status = CellStatus.DEFAULT;
-    }
+    const { game, x, y } = this.props;
+    game.exposeCell(x, y);
   };
 
-  handleRightClick = (e) => {
+  handleRightClick = e => {
     e.preventDefault();
     console.log('Right Click!');
   };
@@ -41,17 +39,37 @@ class Cell extends React.Component<IProps> {
   render() {
     console.log('Render cell');
     const entity = this.props.entity;
+
+    let cell =
+      entity.status === CellStatus.EXPOSED ? (
+        entity.isMine ? (
+          <Exposed>*</Exposed>
+        ) : (
+          <Exposed>{entity.neiborMine > 0 ? entity.neiborMine : ' '}</Exposed>
+        )
+      ) : (
+        <NotExposed />
+      );
+
+    if (entity.status === CellStatus.EXPOSED) {
+      if (entity.isMine) {
+        cell = <Exposed>*</Exposed>;
+      } else {
+        cell = <Exposed>{entity.neiborMine > 0 && entity.neiborMine}</Exposed>;
+      }
+    } else if (entity.status === CellStatus.MARKED) {
+      cell = <NotExposed>+</NotExposed>;
+    } else {
+      cell = <NotExposed />;
+    }
+
     return (
       <div
         className={this.props.className}
         onContextMenu={this.handleRightClick}
         onClick={this.handleClick}
       >
-        {entity.status === CellStatus.EXPOSED ? (
-          <Exposed>{entity.neiborMine}</Exposed>
-        ) : (
-          <NotExposed>{entity.neiborMine}</NotExposed>
-        )}
+        {cell}
       </div>
     );
   }
@@ -64,9 +82,14 @@ const CellStyled = styled(Cell)`
   display: flex;
   flex: 1;
   margin: 2px;
-  border: solid 1px black;
   text-align: center;
-  font-size: 150%;
+  color: black;
+  font-size: 16px;
+  flex-direction: column;
+  user-select: none;
+  width: 24px;
+  height: 24px;
+
   user-select: none;
 `;
 

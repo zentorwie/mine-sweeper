@@ -2,6 +2,8 @@ import { hot } from 'react-hot-loader';
 import * as React from 'react';
 import styled from 'styled-components';
 import { Board } from './Board';
+import { game } from './mobx/Store';
+import { observer } from 'mobx-react';
 
 const Container = styled.div`
   display: flex;
@@ -17,13 +19,16 @@ const Info = styled.div`
   font-size: 20px;
 `;
 
+@observer
 class App extends React.Component {
   render() {
     return (
       <Container>
         <Title>Mine Sweeper</Title>
         <Info>Info</Info>
-        <Board />
+        <button onClick={() => game.reset()}>reset</button>
+        <div>{game.ended && 'GAME OVER'}</div>
+        <Board entity={game.board} game={game} />
       </Container>
     );
   }

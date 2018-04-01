@@ -1,23 +1,21 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Cell } from './Cell';
-import { boardEntity } from './mobx/Store';
 import { observer } from 'mobx-react';
+import { Game, BoardEntity } from './mobx/Store';
 
-interface IProps {}
+interface IProps {
+  entity: BoardEntity;
+  game: Game;
+}
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: gray;
-  width: 300px;
-  height: 300px;
   padding: 2px;
 `;
 
 const Row = styled.div`
-  flex: 1;
-
   display: flex;
   flex-direction: row;
 `;
@@ -25,11 +23,14 @@ const Row = styled.div`
 @observer
 class Board extends React.Component<IProps> {
   render() {
-    console.log(boardEntity.cells);
+    const entity = this.props.entity;
+    const game = this.props.game;
     return (
       <Container>
-        {boardEntity.cells.map((r, i) => (
-          <Row key={i}>{r.map((c, j) => <Cell key={j} entity={c} />)}</Row>
+        {entity.cells.map((r, i) => (
+          <Row key={i}>
+            {r.map((c, j) => <Cell key={j} x={i} y={j} entity={c} game={game} />)}
+          </Row>
         ))}
       </Container>
     );

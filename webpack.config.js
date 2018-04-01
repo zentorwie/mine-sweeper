@@ -10,7 +10,7 @@ module.exports = {
         filename: 'bundle.js'
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js', 'jsx', '.json']
+        extensions: ['.ts', '.tsx', '.js', 'jsx', '.json', 'css', 'less']
     },
     module: {
         rules: [{
@@ -18,6 +18,11 @@ module.exports = {
             test: /\.(tsx?)|(jsx?)$/,
             exclude: /node_modules/,
             loader: 'babel-loader',
+        }, {
+            test: /\.(less|css)$/,
+            use: [
+                'style-loader', 'css-loader', 'less-loader'
+            ]
         }],
     },
     devtool: 'cheap-module-source-map',
